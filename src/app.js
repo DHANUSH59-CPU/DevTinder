@@ -69,16 +69,43 @@ app.delete("/user", async (req, res) => {
 
 // patch method -> Update data of user
 
-app.patch("/user", async (req, res) => {
+// Added Sanitizing and Validations at Api level
+
+app.patch("/user/:userId", async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.params;
+
+    const ALLOWED_UPDATE = [
+      "password",
+      "firstName",
+      "lastName",
+      "dateOfBirth",
+      "phone",
+      "skills",
+    ];
+
     const data = req.body;
-    await User.findByIdAndUpdate({ _id: userId }, data); // there is 3rd parameter called options
+
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATE.includes(k)
+    );
+
+    if (!isUpdateAllowed) {
+      throw new Error("Update is not possible");
+    }
+
+    if (data?.skills.length > 10) {
+      throw new Error("You can add only 10 skills");
+    }
+
+    await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    }); // there is 3rd parameter called options (runValidators used to run validate after the update also)
     res.send("Upadated successfully");
     cosnole.log(data);
   } catch (err) {
     console.error(err.message);
-    res.send(err);
+    res.send(err.message);
   }
 });
 
