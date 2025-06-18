@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-
+const validator = require("validator");
 const userSchema = new Schema(
   {
     firstName: {
@@ -19,18 +19,24 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [
-        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        "Please enter a valid email address",
-      ],
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Enter a valid mail");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
       minlength: 6, // You can increase it to 8 or more if needed
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a Strong password");
+        }
+      },
     },
     gender: {
-      type: String,
+      type: String, // this is field of schema, you can read docs for  it
       enum: ["male", "female", "other"],
     },
     dateOfBirth: {

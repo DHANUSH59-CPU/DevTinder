@@ -2,22 +2,85 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
+// NEVER TRUST req.body
+
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middleware/auth");
+
 const { connectDB } = require("./config/database");
 
 const User = require("./models/user");
+const { validateSignUp, validateLogin } = require("./utils/validate");
 
 app.use(express.json());
-app.post("/adduser", async (req, res) => {
+app.use(cookieParser());
+
+app.post("/signup", async (req, res) => {
   const userObj = req.body;
   // creating a new instance of User Model
   try {
-    const user = new User(userObj);
+    // before going further 1st we will validate req.body
+    validateSignUp(req);
+    const { firstName, lastName, email, password } = req.body;
+
+    // Encrypt the password
+    //We need to download bcrypt for it
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+    });
 
     await user.save();
     res.send("Connected suceefully");
   } catch (err) {
-    console.error(err);
-    res.status(400).send("Not able to create");
+    console.error(err.message);
+    res.status(400).send("Error : " + err.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    validateLogin(req);
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+    const validpassword = await bcrypt.compare(password, user.password);
+
+    if (validpassword) {
+      // Lets generate jwt token
+      const token = await jwt.sign({ _id: user._id }, "Dev@Tinder$01");
+      // Lets wrap it inside the cookie
+      // console.log(token);
+      res.cookie("token", token);
+    }
+    if (!validpassword) {
+      throw new Error("Password Not valid");
+    } else {
+      res.send("Login successfull");
+    }
+  } catch (err) {
+    console.log("An Error Appeared : " + err.message);
+    res.send("ERROR : " + err.message);
+  }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.send(user);
+  } catch (err) {
+    console.log("An Error Appeared : " + err.message);
+    res.send("ERROR : " + err.message);
   }
 });
 
@@ -31,7 +94,6 @@ app.get("/getuser", async (req, res) => {
     if (!user) {
       console.log("There is no user with that email");
     }
-
     res.send(user);
   } catch (err) {
     console.error(err);
