@@ -12,7 +12,7 @@ const userAuth = async (req, res, next) => {
     }
 
     const { _id } = await validateToken(token); // adding await was very important here
-    console.log(_id);
+    // console.log(_id);
 
     const user = await User.findById(_id);
 

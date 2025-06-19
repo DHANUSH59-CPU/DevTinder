@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 const userSchema = new Schema(
   {
     firstName: {
@@ -28,7 +31,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6, // You can increase it to 8 or more if needed
+      minlength: 6,
       validate(value) {
         if (!validator.isStrongPassword(value)) {
           throw new Error("Enter a Strong password");
@@ -36,7 +39,7 @@ const userSchema = new Schema(
       },
     },
     gender: {
-      type: String, // this is field of schema, you can read docs for  it
+      type: String,
       enum: ["male", "female", "other"],
     },
     dateOfBirth: {
@@ -48,6 +51,14 @@ const userSchema = new Schema(
     },
     skills: {
       type: Array,
+      default: [],
+    },
+    age: {
+      type: Number,
+    },
+    about: {
+      type: String,
+      default: "This is default",
     },
   },
   {
@@ -55,5 +66,18 @@ const userSchema = new Schema(
   }
 );
 
+// ✅ Add methods BEFORE compiling the model
+userSchema.methods.getJWT = async function () {
+  return jwt.sign({ _id: this._id }, "Dev@Tinder$01", {
+    expiresIn: "3d",
+  });
+};
+
+userSchema.methods.validatePassword = async function (passwordByUser) {
+  return await bcrypt.compare(passwordByUser, this.password);
+};
+
+// ✅ Compile the model after defining everything
 const User = mongoose.model("user", userSchema);
+
 module.exports = User;

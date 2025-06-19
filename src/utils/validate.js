@@ -41,4 +41,37 @@ const validateToken = async (token) => {
   return decodedToken;
 };
 
-module.exports = { validateSignUp, validateLogin, validateToken };
+const validateProfileData = (req, res) => {
+  const ALLOWED_EDIT_FIELDS = [
+    "firstName",
+    "lastName",
+    "dateOfBirth",
+    "phone",
+    "skills",
+  ];
+
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    ALLOWED_EDIT_FIELDS.includes(field)
+  );
+
+  const { firstName, lastName, about, skills, dateOfBirth, gender } = req.body;
+  //* add validation for each field
+
+  if (firstName && (firstName.length > 25 || firstName.length < 3)) {
+    throw new Error("First name must be 3-25 characters");
+  }
+  if (lastName && (lastName.length > 25 || lastName.length < 3)) {
+    throw new Error("Last name must be 3-25 characters");
+  }
+  if (about && about.length > 500) {
+    throw new Error("About contain too many words");
+  }
+  return isEditAllowed;
+};
+
+module.exports = {
+  validateSignUp,
+  validateLogin,
+  validateToken,
+  validateProfileData,
+};
