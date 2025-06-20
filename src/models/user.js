@@ -60,6 +60,11 @@ const userSchema = new Schema(
       type: String,
       default: "This is default",
     },
+    status: {
+      type: String,
+      enum: ["active", "deactivated", "banned"],
+      default: "active",
+    },
   },
   {
     timestamps: true,
@@ -82,6 +87,6 @@ userSchema.methods.validatePassword = async function (passwordByUser) {
 };
 
 // ✅ Compile the model after defining everything
-const User = mongoose.model("user", userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;
