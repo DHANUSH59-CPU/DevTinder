@@ -16,9 +16,10 @@ app.use(cookieParser());
 
 const authRouter = require("./routers/auth");
 const profileRouter = require("./routers/profile");
-
+const requestRouter = require("./routers/request");
 app.use("/", authRouter);
 app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 // delete method -> findbyIdanddelete
 

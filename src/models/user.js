@@ -66,6 +66,10 @@ const userSchema = new Schema(
   }
 );
 
+// Creating index
+userSchema.index({ firstName: 1, lastName: 1 });
+userSchema.index({ skills: 1 });
+
 // ✅ Add methods BEFORE compiling the model
 userSchema.methods.getJWT = async function () {
   return jwt.sign({ _id: this._id }, "Dev@Tinder$01", {
