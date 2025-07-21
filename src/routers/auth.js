@@ -16,7 +16,19 @@ authRouter.post("/signup", async (req, res) => {
   try {
     // before going further 1st we will validate req.body
     validateSignUp(req);
-    const { firstName, lastName, email, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      photoURL,
+      skills,
+      gender,
+      age,
+      phone,
+      about,
+      dateOfBirth,
+    } = req.body;
 
     // Encrypt the password
     //We need to download bcrypt for it
@@ -27,6 +39,13 @@ authRouter.post("/signup", async (req, res) => {
       lastName,
       email,
       password: passwordHash,
+      photoURL,
+      skills,
+      gender,
+      age,
+      phone,
+      about,
+      dateOfBirth,
     });
 
     await user.save();
@@ -60,11 +79,11 @@ authRouter.post("/login", async (req, res) => {
     if (!validpassword) {
       throw new Error("Password Not valid");
     } else {
-      res.send("Login successfull");
+      res.status(200).send(user);
     }
   } catch (err) {
     console.log("An Error Appeared : " + err.message);
-    res.send("ERROR : " + err.message);
+    res.status(401).send("ERROR : " + err.message);
   }
 });
 

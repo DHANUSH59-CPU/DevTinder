@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-
+const cors = require("cors");
 // NEVER TRUST req.body
 
 const bcrypt = require("bcrypt");
@@ -11,6 +11,7 @@ const { userAuth } = require("./middleware/auth");
 const { connectDB } = require("./config/database");
 const User = require("./models/user");
 
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

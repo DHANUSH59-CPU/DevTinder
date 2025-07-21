@@ -32,6 +32,7 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     });
   } catch (err) {
     console.log("ERROR FOUND : " + err.message);
+    res.status(400).json({ message: "Error fetching Profile" });
   }
 });
 

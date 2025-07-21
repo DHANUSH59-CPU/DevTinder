@@ -65,6 +65,16 @@ const userSchema = new Schema(
       enum: ["active", "deactivated", "banned"],
       default: "active",
     },
+    photoURL: {
+      type: String,
+      default: null,
+      validate(value) {
+        // Only validate if value is provided (not null/undefined)
+        if (value && !validator.isURL(value)) {
+          throw new Error("Please provide a valid photo URL");
+        }
+      },
+    },
   },
   {
     timestamps: true,
