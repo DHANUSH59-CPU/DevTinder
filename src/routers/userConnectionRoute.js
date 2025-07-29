@@ -25,7 +25,7 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
       data: connectionRequests,
     });
   } catch (err) {
-    req.statusCode(400).send("ERROR: " + err.message);
+    res.status(400).send("ERROR: " + err.message);
   }
 });
 
@@ -51,7 +51,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
       return res.status(400).json({ message: "Empty" });
     }
 
-    res.status(200).json({ message: connections });
+    res.status(200).json({ data: connections });
   } catch (err) {
     res.status(400).json({ message: "ERROR FOUND : " + err.message });
   }
