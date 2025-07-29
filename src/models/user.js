@@ -70,8 +70,14 @@ const userSchema = new Schema(
       default: null,
       validate(value) {
         // Only validate if value is provided (not null/undefined)
-        if (value && !validator.isURL(value)) {
-          throw new Error("Please provide a valid photo URL");
+        if (value) {
+          // Accept both standard URLs and base64 data URLs
+          const isValidURL = validator.isURL(value);
+          const isValidDataURL = value.startsWith('data:image/') && value.includes('base64,');
+          
+          if (!isValidURL && !isValidDataURL) {
+            throw new Error("Please provide a valid photo URL or image data");
+          }
         }
       },
     },
