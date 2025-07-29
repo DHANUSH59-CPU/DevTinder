@@ -11,7 +11,7 @@ const { userAuth } = require("./middleware/auth");
 const { connectDB } = require("./config/database");
 const User = require("./models/user");
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: ["http://localhost:3001", "http://localhost:5173"], credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 

@@ -48,13 +48,17 @@ const validateProfileData = (req, res) => {
     "dateOfBirth",
     "phone",
     "skills",
+    "photoURL",
+    "age",
+    "gender",
+    "about",
   ];
 
   const isEditAllowed = Object.keys(req.body).every((field) =>
     ALLOWED_EDIT_FIELDS.includes(field)
   );
 
-  const { firstName, lastName, about, skills, dateOfBirth, gender } = req.body;
+  const { firstName, lastName, about, skills, dateOfBirth, gender, age } = req.body;
   //* add validation for each field
 
   if (firstName && (firstName.length > 25 || firstName.length < 3)) {
@@ -65,6 +69,12 @@ const validateProfileData = (req, res) => {
   }
   if (about && about.length > 500) {
     throw new Error("About contain too many words");
+  }
+  if (age && (isNaN(age) || age < 18 || age > 100)) {
+    throw new Error("Age must be a number between 18 and 100");
+  }
+  if (gender && !["male", "female", "other"].includes(gender.toLowerCase())) {
+    throw new Error("Gender must be male, female, or other");
   }
   return isEditAllowed;
 };

@@ -21,6 +21,17 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     }
 
     const loggedInuser = req.user;
+    
+    // Convert age to number if provided
+    if (req.body.age) {
+      req.body.age = parseInt(req.body.age);
+    }
+    
+    // Convert gender to lowercase for consistency
+    if (req.body.gender) {
+      req.body.gender = req.body.gender.toLowerCase();
+    }
+    
     Object.keys(req.body).forEach(
       (field) => (loggedInuser[field] = req.body[field])
     );
@@ -29,10 +40,11 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
     res.status(200).json({
       message: `${loggedInuser.firstName}, Your profile has been updated`,
+      data: loggedInuser,
     });
   } catch (err) {
     console.log("ERROR FOUND : " + err.message);
-    res.status(400).json({ message: "Error fetching Profile" });
+    res.status(400).json({ error: err.message });
   }
 });
 
