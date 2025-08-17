@@ -37,7 +37,7 @@ const validateLogin = (req) => {
 
 // Validate the token here
 const validateToken = async (token) => {
-  const decodedToken = await jwt.verify(token, "Dev@Tinder$01");
+  const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
   return decodedToken;
 };
 
@@ -58,7 +58,8 @@ const validateProfileData = (req, res) => {
     ALLOWED_EDIT_FIELDS.includes(field)
   );
 
-  const { firstName, lastName, about, skills, dateOfBirth, gender, age } = req.body;
+  const { firstName, lastName, about, skills, dateOfBirth, gender, age } =
+    req.body;
   //* add validation for each field
 
   if (firstName && (firstName.length > 25 || firstName.length < 3)) {

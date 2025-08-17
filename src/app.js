@@ -1,6 +1,7 @@
 const express = require("express");
+require('dotenv').config();
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const cors = require("cors");
 // NEVER TRUST req.body
 
@@ -84,7 +85,7 @@ connectDB()
   .then(() => {
     console.log("Database is connected");
     app.listen(port, () => {
-      console.log("server is listening on port 3000...");
+      console.log(`server is listening on port ${port}...`);
     });
   })
   .catch((err) => console.log(err));

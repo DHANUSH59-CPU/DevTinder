@@ -93,8 +93,8 @@ userSchema.index({ skills: 1 });
 
 // ✅ Add methods BEFORE compiling the model
 userSchema.methods.getJWT = async function () {
-  return jwt.sign({ _id: this._id }, "Dev@Tinder$01", {
-    expiresIn: "3d",
+  return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE || "3d",
   });
 };
 
