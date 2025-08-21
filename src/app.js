@@ -1,31 +1,37 @@
 const express = require("express");
-require('dotenv').config();
+require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3000;
 const cors = require("cors");
-// NEVER TRUST req.body
-
-const bcrypt = require("bcrypt");
+const initializeSocket = require("./utils/socket");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const { userAuth } = require("./middleware/auth");
 const { connectDB } = require("./config/database");
-const User = require("./models/user");
+const http = require("http");
 
-app.use(cors({ origin: ["http://localhost:3001", "http://localhost:5173"], credentials: true }));
-app.use(express.json({ limit: '10mb' })); // Increased payload limit for image uploads
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : ["http://localhost:3001", "http://localhost:5173"],
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: "10mb" })); // Increased payload limit for image uploads
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
 const authRouter = require("./routers/auth");
 const profileRouter = require("./routers/profile");
 const requestRouter = require("./routers/request");
 const userRouter = require("./routers/userConnectionRoute");
+const chatRouter = require("./routers/chat");
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
 
+const server = http.createServer(app);
+
+initializeSocket(server);
 // delete method -> findbyIdanddelete
 
 // app.delete("/user", async (req, res) => {
@@ -84,7 +90,7 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("Database is connected");
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`server is listening on port ${port}...`);
     });
   })
